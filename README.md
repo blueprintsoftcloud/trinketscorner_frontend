@@ -1,2 +1,2 @@
-# trinketscorner_frontend
+# crm_frontend
 Blueprint software - Own Product
