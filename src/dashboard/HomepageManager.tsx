@@ -3010,22 +3010,69 @@ export default function HomepageManager() {
                         {isActive ? "Active" : "Set Active"}
                       </button>
                       <button
-                        onClick={() =>
+                        type="button"
+                        onClick={() => openHeroEdit(key)}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-colors flex items-center justify-center gap-1 cursor-pointer ${
                           isEditing
-                            ? setEditingHeroTemplate(null)
-                            : openHeroEdit(key)
-                        }
-                        className="flex-1 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-300 text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors flex items-center justify-center gap-1"
+                            ? "bg-indigo-50 text-indigo-700 border-indigo-300"
+                            : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
+                        }`}
                       >
                         <PencilSquareIcon className="w-3.5 h-3.5" />
-                        {isEditing ? "Cancel" : "Edit"}
+                        Edit
                       </button>
                     </div>
                   </div>
+                </div>
+              );
+            })}
+          </div>
 
-                  {/* Inline edit form */}
-                  {isEditing && (
-                    <div className="border-t border-gray-100 p-4 bg-gray-50 space-y-3">
+          {/* Hero Template Edit Modal */}
+          {editingHeroTemplate && (() => {
+            const key = editingHeroTemplate;
+            const label = HERO_TEMPLATE_LABELS[key];
+            return (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn"
+                onClick={() => setEditingHeroTemplate(null)}
+              >
+                <div
+                  className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Modal Header */}
+                  <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 sticky top-0 z-10">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+                        <PencilSquareIcon className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-slate-800 truncate">
+                            Edit Content — {label?.name || `Template ${key}`}
+                          </h3>
+                          <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full shrink-0">
+                            Template {key}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {label?.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingHeroTemplate(null)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer shrink-0 ml-2"
+                      title="Close"
+                    >
+                      <XMarkIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Modal Body - Scrollable */}
+                  <div className="p-5 space-y-4 overflow-y-auto flex-1">
                       {key !== "6" && key !== "9" && key !== "10" && (
                         <>
                           <div>
@@ -4314,19 +4361,40 @@ export default function HomepageManager() {
                           </div>
                         </div>
                       )}
-                      <button
-                        onClick={() => saveHeroTemplate()}
-                        disabled={savingHero}
-                        className="w-full py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50"
-                      >
-                        {savingHero ? "Saving..." : "Save Template"}
-                      </button>
-                    </div>
-                  )}
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/80 flex items-center justify-end gap-2.5 sticky bottom-0 z-10">
+                    <button
+                      type="button"
+                      onClick={() => setEditingHeroTemplate(null)}
+                      className="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => saveHeroTemplate()}
+                      disabled={savingHero}
+                      className="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      {savingHero ? (
+                        <>
+                          <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        "Save Template"
+                      )}
+                    </button>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -6655,43 +6723,47 @@ export default function HomepageManager() {
                     </div>
 
                     {/* Text Details Area */}
-                    <div className="p-4 flex-1 flex flex-col justify-between bg-white">
-                      <div className="mb-3">
-                        <h4 className="font-bold text-gray-950 text-sm tracking-tight truncate">
+                    <div className="p-4 flex-1 flex flex-col justify-between bg-white min-w-0">
+                      <div className="mb-3 min-w-0">
+                        <h4 className="font-bold text-gray-950 text-sm tracking-tight truncate" title={banner.title}>
                           {banner.title || "(Graphic banner - no text)"}
                         </h4>
                         {banner.description && (
-                          <p className="text-gray-500 text-[11px] leading-relaxed line-clamp-2 mt-0.5">
+                          <p className="text-gray-500 text-[11px] leading-relaxed line-clamp-2 mt-0.5 break-words">
                             {banner.description}
                           </p>
                         )}
                         {banner.link && (
-                          <p className="text-indigo-600 text-[10px] truncate mt-1 flex items-center gap-1 font-mono">
-                            <span className="text-gray-400">🔗</span>
+                          <p className="text-indigo-600 text-[10px] truncate mt-1 flex items-center gap-1 font-mono min-w-0" title={banner.link}>
+                            <span className="text-gray-400 shrink-0">🔗</span>
                             <span className="truncate">{banner.link}</span>
                           </p>
                         )}
                       </div>
 
                       {/* Compact Operations Bar */}
-                      <div className="flex items-center gap-1.5 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-1.5 pt-3 border-t border-gray-100 min-w-0 w-full">
                         <button
+                          type="button"
                           onClick={() => handleToggle(banner)}
-                          className="px-2.5 py-1.5 text-[11px] font-semibold text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                          className="px-2.5 py-1.5 text-[11px] font-semibold text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors shrink-0 cursor-pointer"
                         >
                           {banner.isActive ? "Hide" : "Show"}
                         </button>
                         <button
+                          type="button"
                           onClick={() => openEdit(banner)}
-                          className="flex-1 py-1.5 text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-1"
+                          className="flex-1 py-1.5 text-[11px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-1 min-w-0 cursor-pointer"
                         >
-                          <PencilSquareIcon className="w-3.5 h-3.5" />
-                          Edit
+                          <PencilSquareIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">Edit</span>
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDelete(banner)}
                           disabled={deletingId === banner.id}
-                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors shrink-0 cursor-pointer"
+                          title="Delete banner"
                         >
                           <TrashIcon className="w-3.5 h-3.5" />
                         </button>
@@ -6706,7 +6778,7 @@ export default function HomepageManager() {
                 {filtered.map((banner) => (
                   <div
                     key={banner.id}
-                    className={`relative flex flex-col sm:flex-row bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 ${banner.isActive
+                    className={`relative flex flex-col sm:flex-row bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 min-w-0 ${banner.isActive
                       ? "border-gray-200/80"
                       : "border-gray-300 bg-gray-50/40 opacity-70"
                       }`}
@@ -6725,11 +6797,11 @@ export default function HomepageManager() {
                     </div>
 
                     {/* Operational Controls & Info Canvas */}
-                    <div className="flex-1 flex flex-col justify-between p-4 sm:p-4.5">
-                      <div>
+                    <div className="flex-1 flex flex-col justify-between p-4 sm:p-4.5 min-w-0">
+                      <div className="min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <span
-                            className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1${banner.isActive
+                            className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 ${banner.isActive
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-rose-50 text-rose-600 border border-rose-200"
                               }`}
@@ -6739,7 +6811,7 @@ export default function HomepageManager() {
                           </span>
                         </div>
 
-                        <h4 className="font-bold text-gray-950 text-base tracking-tight line-clamp-1 mb-1">
+                        <h4 className="font-bold text-gray-950 text-base tracking-tight truncate mb-1" title={banner.title}>
                           {banner.title || "(Graphic banner - no text)"}
                         </h4>
 
@@ -6750,12 +6822,12 @@ export default function HomepageManager() {
                         )}
 
                         {banner.description && (
-                          <p className="text-gray-500 text-xs leading-relaxed line-clamp-3">
+                          <p className="text-gray-500 text-xs leading-relaxed line-clamp-3 break-words">
                             {banner.description}
                           </p>
                         )}
                         {banner.link && (
-                          <div className="flex items-center gap-1.5 text-xs text-indigo-600 mt-2 font-mono truncate">
+                          <div className="flex items-center gap-1.5 text-xs text-indigo-600 mt-2 font-mono min-w-0" title={banner.link}>
                             <span className="shrink-0 text-gray-400">🔗</span>
                             <span className="truncate">{banner.link}</span>
                           </div>
@@ -6763,26 +6835,30 @@ export default function HomepageManager() {
                       </div>
 
                       {/* Integrated Action Bar Baseline */}
-                      <div className="flex items-center gap-2 pt-3 mt-3 border-t border-gray-100/70">
+                      <div className="flex items-center gap-2 pt-3 mt-3 border-t border-gray-100/70 w-full min-w-0">
                         <button
+                          type="button"
                           onClick={() => handleToggle(banner)}
-                          className="flex-1 py-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                          className="px-3 py-2 text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors shrink-0 cursor-pointer"
                         >
-                        {banner.isActive ? "Hide" : "Show"}
+                          {banner.isActive ? "Hide" : "Show"}
                         </button>
 
                         <button
+                          type="button"
                           onClick={() => openEdit(banner)}
-                          className="flex-1 py-2 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all flex items-center justify-center gap-1"
+                          className="flex-1 py-2 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all flex items-center justify-center gap-1 min-w-0 cursor-pointer"
                         >
-                          <PencilSquareIcon className="w-3.5 h-3.5" />
-                          Edit
+                          <PencilSquareIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span className="truncate">Edit</span>
                         </button>
 
                         <button
+                          type="button"
                           onClick={() => handleDelete(banner)}
                           disabled={deletingId === banner.id}
-                          className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all disabled:opacity-40"
+                          className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all disabled:opacity-40 shrink-0 cursor-pointer"
+                          title="Delete banner"
                         >
                           <TrashIcon className="w-4 h-4" />
                         </button>
